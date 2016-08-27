@@ -27,3 +27,9 @@
 *.exe
 *.out
 *.app
+
+#my polygon
+*.pro
+*.user
+*.Debug
+*.Release
