@@ -5,7 +5,6 @@
 #include <cmath>
 #include "rect.h"
 using namespace std;
-#define publicPoint 0 //1表示共点多边形分开算 0 表示共点多边形算一个多边形
 #define INFINITE 100
 typedef pair<double,double> Point;
 typedef pair<double,pair<double,double> > OrderPoint;
