@@ -44,21 +44,21 @@ int main()
             {
                 if(ii==jj)
                     continue;
-                /*
+            //    /*
             cout << "size:" << face.size() <<endl;
             cout << "ii="<< ii <<"," << "jj="<<jj<<endl;
             cout << IsLoopClockwise(face[ii]) << "_" << IsLoopClockwise(face[jj])<<endl;
             cout << "origin polygon " <<endl;
-                for(int i=0;i<face[ii].size();i++)
+                for(unsigned int i=0;i<face[ii].size();i++)
                 {
                     cout <<face[ii][i].first << ":" << face[ii][i].second.first << "," << face[ii][i].second.second <<"\t";
                 }cout <<endl;
-                for(int i=0;i<face[jj].size();i++)
+                for(unsigned int i=0;i<face[jj].size();i++)
                 {
                     cout <<face[jj][i].first << ":" << face[jj][i].second.first << "," << face[jj][i].second.second <<"\t";
                 }cout <<endl;
 
-        */
+       // */
                 Loop loopi,loopj;
                 // loops with a pubilc point
                 if(IsPolygonHavePublicPoint(face[ii],face[jj])==1 && publicPoint==1 && !(IsLoopConnectLoop(face[ii],face[jj]) || IsLoopConnectLoop(face[jj],face[ii])))
@@ -204,6 +204,10 @@ int main()
                         {
                             loopi.pop_back();
                         }
+                        if(loopi[0].first==1 && loopi[loopi.size()-1].first==face[ii].size())
+                        {
+                            loopi.pop_back();
+                        }
                         if(loopi[0].first==-1 && loopi[loopi.size()-1].first==face[ii].size() && loopi.size()>2)
                         {
                             loopi.pop_back();
@@ -216,10 +220,48 @@ int main()
                         {
                             loopj.pop_back();
                         }
+                        if(loopj[0].first==1 && loopj[loopj.size()-1].first==face[jj].size())
+                        {
+                            loopj.pop_back();
+                        }
                         if(loopj[0].first==-1 && loopj[loopj.size()-1].first==face[jj].size() && loopj.size()>2)
                         {
                             loopj.pop_back();
                             loopj.erase(loopj.begin());
+                        }
+                    }
+                    for(unsigned int i=0;i<loopi.size();i++)
+                    {int cnt=0;
+                        for(unsigned int j=0;j<loopj.size();j++)
+                        {
+
+                            if(loopi[i].second.first==loopj[j].second.first && loopi[i].second.second==loopj[j].second.second)
+                            {
+                                cnt++;
+                            }
+
+                        }
+                        if(cnt==0)
+                        {
+                            loopi.erase(loopi.begin()+i);
+                            i--;
+                        }
+                    }
+                    for(unsigned int i=0;i<loopj.size();i++)
+                    {int cnt=0;
+                        for(unsigned int j=0;j<loopi.size();j++)
+                        {
+
+                            if(loopj[i].second.first==loopi[j].second.first && loopj[i].second.second==loopi[j].second.second)
+                            {
+                                cnt++;
+                            }
+
+                        }
+                        if(cnt==0)
+                        {
+                            loopj.erase(loopj.begin()+i);
+                            i--;
                         }
                     }
                     ///*
@@ -241,8 +283,13 @@ int main()
                         {
                             Point flag;
                             if(loopi[k].first<0)
-                                flag=loopi[(k+1)%loopi.size()].second;
-
+                            {
+                                flag=loopi[(k)%loopj.size()].second;
+                            }
+                            else
+                            {
+                                flag=loopi[k].second;
+                            }
                             for(unsigned int ij=0;ij<loopi.size();ij++)
                             {
                                 if(loopi[ij].second==flag)
@@ -259,6 +306,45 @@ int main()
                                     ij--;
                                 }
                             }
+                            k--;
+                        }
+                    }
+    cout << "i done" <<endl;
+    cout<< "loop1"<<endl;
+    for(unsigned int i=0;i<loopi.size();i++)
+    {
+        cout <<loopi[i].first << " " << loopi[i].second.first << "," << loopi[i].second.second <<endl;
+    }cout << endl;
+                    for(unsigned int k=0;k<loopj.size();k++)
+                    {
+                        if(loopj[k].first*loopj[(k+1)%loopj.size()].first>0)
+                        {
+                            Point flag;
+                            if(loopj[k].first<0)
+                            {
+                                flag=loopj[(k)%loopj.size()].second;
+                            }
+                            else
+                            {
+                                flag=loopj[k].second;
+                            }
+                            for(unsigned int ij=0;ij<loopi.size();ij++)
+                            {
+                                if(loopi[ij].second==flag)
+                                {
+                                    loopi.erase(loopi.begin()+ij);
+                                    ij--;
+                                }
+                            }
+                            for(unsigned int ij=0;ij<loopj.size();ij++)
+                            {
+                                if(loopj[ij].second==flag)
+                                {
+                                    loopj.erase(loopj.begin()+ij);
+                                    ij--;
+                                }
+                            }
+
                             k--;
                         }
                     }
@@ -275,33 +361,6 @@ int main()
                         cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
                     }cout << endl;
                     //*/
-                    for(unsigned int k=0;k<loopj.size();k++)
-                    {
-                        if(loopj[k].first*loopj[(k+1)%loopi.size()].first>0)
-                        {
-                            Point flag;
-                            if(loopj[k].first<0)
-                                flag=loopj[(k+1)%loopi.size()].second;
-                            for(unsigned int ij=0;ij<loopi.size();ij++)
-                            {
-                                if(loopi[ij].second==flag)
-                                {
-                                    loopi.erase(loopi.begin()+ij);
-                                    ij--;
-                                }
-                            }
-                            for(unsigned int ij=0;ij<loopj.size();ij++)
-                            {
-                                if(loopj[ij].second==flag)
-                                {
-                                    loopj.erase(loopj.begin()+ij);
-                                    ij--;
-                                }
-                            }
-                            k--;
-                        }
-                    }
-
                     Loop loop1,loop2,loop3;
                     loop1=face[ii];
                     loop2=face[jj];
