@@ -166,9 +166,16 @@ bool IsLoopContainLoop(const Loop &loop1,const Loop &loop2)
         if(IsPointInsideLoop(loop2,loop1[i].second))
         cnt2++;
     }
-    if(cnt1==loop2.size()-1 && cnt2==0)
-    return true;
-    else
+    if(cnt2==0 && cnt1==loop2.size()-1 && loop2.size()!=5)
+        return true;
+    if(loop2.size()==5)
+    {
+    Point p;
+    p.first=(loop2[0].second.first+loop2[2].second.first)/2;
+    p.second=(loop2[0].second.second+loop2[2].second.second)/2;
+    if(cnt2==0 && cnt1==loop2.size()-1 && IsPointInsideLoop(loop1,p))
+        return true;
+    }
     return false;
 }
 

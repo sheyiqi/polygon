@@ -9,7 +9,7 @@
 #include <fstream>
 using namespace std;
 #define publicPoint 0 //1表示共点多边形分开算 0 表示共点多边形算一个多边形
-#define INFINITE 100
+#define INFINITE 100    //bianjie
 typedef pair<double,double> Point;
 typedef pair<double,pair<double,double> > OrderPoint;
 typedef vector<pair<double,pair<double,double> > > Loop;
@@ -44,11 +44,11 @@ int main()
             {
                 if(ii==jj)
                     continue;
-            //    /*
-            cout << "size:" << face.size() <<endl;
-            cout << "ii="<< ii <<"," << "jj="<<jj<<endl;
-            cout << IsLoopClockwise(face[ii]) << "_" << IsLoopClockwise(face[jj])<<endl;
-            cout << "origin polygon " <<endl;
+                //    /*
+                cout << "size:" << face.size() <<endl;
+                cout << "ii="<< ii <<"," << "jj="<<jj<<endl;
+                cout << IsLoopClockwise(face[ii]) << "_" << IsLoopClockwise(face[jj])<<endl;
+                cout << "origin polygon " <<endl;
                 for(unsigned int i=0;i<face[ii].size();i++)
                 {
                     cout <<face[ii][i].first << ":" << face[ii][i].second.first << "," << face[ii][i].second.second <<"\t";
@@ -58,7 +58,7 @@ int main()
                     cout <<face[jj][i].first << ":" << face[jj][i].second.first << "," << face[jj][i].second.second <<"\t";
                 }cout <<endl;
 
-       // */
+                // */
                 Loop loopi,loopj;
                 // loops with a pubilc point
                 if(IsPolygonHavePublicPoint(face[ii],face[jj])==1 && publicPoint==1 && !(IsLoopConnectLoop(face[ii],face[jj]) || IsLoopConnectLoop(face[jj],face[ii])))
@@ -76,7 +76,7 @@ int main()
                     {ii--;jj--;}
 
                 }
-                else if(IsLoopContainLoop(face[jj],face[ii]) && IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]))
+                else if(IsLoopContainLoop(face[jj],face[ii]) && IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]) && IsLoopClockwise(face[jj-1]))
                 {
                     face.erase(face.begin()+ii);
                     if(ii<jj)
@@ -93,6 +93,19 @@ int main()
                     {jj--;	jj--;}
                     else
                     {ii--;jj--;}
+                }
+                else if(IsLoopContainLoop(face[ii],face[jj]) && !IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]))
+                {
+                    face.insert(face.begin()+ii,face[jj]);
+                    face.erase(face.begin()+jj+1);
+                    if(ii<jj)
+                    {jj--;jj--;}
+                    else
+                     {ii--;jj--;}
+                }
+                else if(IsLoopContainLoop(face[jj],face[ii]) && !IsLoopClockwise(face[ii]) && !IsLoopClockwise(face[jj]))
+                {
+
                 }
                 else //loops contacted
                 {
@@ -133,11 +146,11 @@ int main()
                             }
                         }
                     }
-                                    cout<< "loop1"<<endl;
-                                   for(int i=0;i<loopi.size();i++)
-                                   {
-                                        cout <<loopi[i].first << " " << loopi[i].second.first << "," << loopi[i].second.second <<endl;
-                                    }cout << endl;
+//                    cout<< "loop1"<<endl;
+//                    for(int i=0;i<loopi.size();i++)
+//                    {
+//                        cout <<loopi[i].first << " " << loopi[i].second.first << "," << loopi[i].second.second <<endl;
+//                    }cout << endl;
                     for(unsigned int j=0;j<(face[jj].size()-1);j++)
                     {
                         for(unsigned int i=0;i<(face[ii].size()-1);i++)
@@ -179,25 +192,75 @@ int main()
                             }
                         }
                     }
-                                    cout << "loop2" <<endl;
-                                    for(int i=0;i<loopj.size();i++)
-                                    {
-                                        cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
-                                   }cout << endl;
+//                    cout << "loop2" <<endl;
+//                    for(int i=0;i<loopj.size();i++)
+//                    {
+//                        cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
+//                    }cout << endl;
 
                 }
                 //	cout << 1 << endl;
                 Face face0;
                 if(loopi.size()!=0)
                 {
-
+                    for(int i=0;i<loopi.size();i++)
+                    {
+                        Point p;
+                        p=loopi[i].second;
+                        int cnt=0;
+                        for(int j=0;j<loopi.size();j++)
+                        {
+                            if(p==loopi[j].second)
+                            {
+                                cnt++;
+                            }
+                        }
+                        for(int j=0;j<loopj.size();j++)
+                        {
+                            if(p==loopj[j].second)
+                            {
+                                cnt++;
+                            }
+                        }
+                        if(cnt>5)
+                        {
+                            for(int j=0;j<loopi.size();j++)
+                            {
+                                if(p==loopi[j].second)
+                                {
+                                    loopi.erase(loopi.begin()+j);
+                                    j--;
+                                }
+                            }
+                            for(int j=0;j<loopj.size();j++)
+                            {
+                                if(p==loopj[j].second)
+                                {
+                                    loopj.erase(loopj.begin()+j);
+                                    j--;
+                                }
+                            }
+                        }
+                    }
                     PaiXu(loopi);
                     PaiXu(loopj);
                     Loop::iterator end_unique1 = unique(loopi.begin(),loopi.end());
                     loopi.erase(end_unique1, loopi.end());
                     Loop::iterator end_unique2 = unique(loopj.begin(),loopj.end());
                     loopj.erase(end_unique2, loopj.end());
-
+//                    ///*
+//                    cout << "paixu"<<"---------------------------------ex  "<<kk << endl;
+//                    cout<< "loop1"<<endl;
+//                    for(unsigned int i=0;i<loopi.size();i++)
+//                    {
+//                        cout <<loopi[i].first << " " << loopi[i].second.first << "," << loopi[i].second.second <<endl;
+//                    }cout << endl;
+//                    cout << "loop2" <<endl;
+//                    for(unsigned int i=0;i<loopj.size();i++)
+//                    {
+//                        cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
+//                    }cout << endl;
+//                    //*/
                     if(loopi[0].second.first==loopi[loopi.size()-1].second.first && loopi[0].second.second==loopi[loopi.size()-1].second.second)
                     {
                         if(loopi[0].first==-1 && loopi[loopi.size()-1].first+face[ii].size()==0)
@@ -230,25 +293,64 @@ int main()
                             loopj.erase(loopj.begin());
                         }
                     }
-                    for(unsigned int i=0;i<loopi.size();i++)
+//                    ///*
+//                    cout << "qutouquwei"<<"---------------------------------ex  "<<kk << endl;
+//                    cout<< "loop1"<<endl;
+//                    for(unsigned int i=0;i<loopi.size();i++)
+//                    {
+//                        cout <<loopi[i].first << " " << loopi[i].second.first << "," << loopi[i].second.second <<endl;
+//                    }cout << endl;
+//                    cout << "loop2" <<endl;
+//                    for(unsigned int i=0;i<loopj.size();i++)
+//                    {
+//                        cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
+//                    }cout << endl;
+//                    //*/
+                    for(int i=0;i<loopi.size();)
                     {
                         if(loopi[i].first+loopi[i+1].first==0 && loopi[i].first>0)
                         {
+                            loopi.erase(loopi.begin()+i+1);
                             loopi.erase(loopi.begin()+i);
-                            loopi.erase(loopi.begin()+i);
+                            if(i==0)
+                                continue;
+                            else
+                                i--;
+
                         }
+                 //       if(loopi[i].first+loopi[i+1].first==0 && loopi[i].first<0)
+                        i++;
+
                     }
-                    for(unsigned int i=0;i<loopj.size();i++)
+                    for(int i=0;i<loopj.size();)
                     {
                         if(loopj[i].first+loopj[i+1].first==0 && loopj[i].first>0)
                         {
+                            loopj.erase(loopj.begin()+i+1);
                             loopj.erase(loopj.begin()+i);
-                            loopj.erase(loopj.begin()+i);
+                            if(i==0)
+                                continue;
+                            else
+                                i--;
                         }
+                        i++;
                     }
-                    for(unsigned int i=0;i<loopi.size();i++)
+//                    ///*
+//                    cout << "qu+-"<<"---------------------------------ex  "<<kk << endl;
+//                    cout<< "loop1"<<endl;
+//                    for(unsigned int i=0;i<loopi.size();i++)
+//                    {
+//                        cout <<loopi[i].first << " " << loopi[i].second.first << "," << loopi[i].second.second <<endl;
+//                    }cout << endl;
+//                    cout << "loop2" <<endl;
+//                    for(unsigned int i=0;i<loopj.size();i++)
+//                    {
+//                        cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
+//                    }cout << endl;
+//                    //*/
+                    for( int i=0;i<loopi.size();i++)
                     {int cnt=0;
-                        for(unsigned int j=0;j<loopj.size();j++)
+                        for( int j=0;j<loopj.size();j++)
                         {
 
                             if(loopi[i].second.first==loopj[j].second.first && loopi[i].second.second==loopj[j].second.second)
@@ -278,25 +380,25 @@ int main()
                             i--;
                         }
                     }
-                    ///*
-                    cout << "release before"<<"---------------------------------ex  "<<kk << endl;
-                    cout<< "loop1"<<endl;
-                    for(unsigned int i=0;i<loopi.size();i++)
-                    {
-                        cout <<loopi[i].first << " " << loopi[i].second.first << "," << loopi[i].second.second <<endl;
-                    }cout << endl;
-                    cout << "loop2" <<endl;
-                    for(unsigned int i=0;i<loopj.size();i++)
-                    {
-                        cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
-                    }cout << endl;
-                    //*/
+//                    ///*
+//                    cout << "release before"<<"---------------------------------ex  "<<kk << endl;
+//                    cout<< "loop1"<<endl;
+//                    for(unsigned int i=0;i<loopi.size();i++)
+//                    {
+//                        cout <<loopi[i].first << " " << loopi[i].second.first << "," << loopi[i].second.second <<endl;
+//                    }cout << endl;
+//                    cout << "loop2" <<endl;
+//                    for(unsigned int i=0;i<loopj.size();i++)
+//                    {
+//                        cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
+//                    }cout << endl;
+//                    //*/
                     for(unsigned int k=0;k<loopi.size();k++)
                     {
                         if(loopi[k].first*loopi[(k+1)%loopi.size()].first>0)
                         {
                             Point flag;
-                            if(loopi[k].first>loopi[(k+1)%loopi.size()].first)
+                            if(loopi[k].first<loopi[(k+1)%loopi.size()].first)
                             {
                                 flag=loopi[(k+1)%loopi.size()].second;
                             }
@@ -323,18 +425,18 @@ int main()
                             k--;
                         }
                     }
-    cout << "i done" <<endl;
-    cout<< "loop1"<<endl;
-    for(unsigned int i=0;i<loopi.size();i++)
-    {
-        cout <<loopi[i].first << " " << loopi[i].second.first << "," << loopi[i].second.second <<endl;
-    }cout << endl;
+//                    cout << "i done" <<endl;
+//                    cout<< "loop1"<<endl;
+//                    for(unsigned int i=0;i<loopi.size();i++)
+//                    {
+//                        cout <<loopi[i].first << " " << loopi[i].second.first << "," << loopi[i].second.second <<endl;
+//                    }cout << endl;
                     for(unsigned int k=0;k<loopj.size();k++)
                     {
                         if(loopj[k].first*loopj[(k+1)%loopj.size()].first>0)
                         {
                             Point flag;
-                            if(loopj[k].first>loopj[(k+1)%loopj.size()].first)
+                            if(loopj[k].first<loopj[(k+1)%loopj.size()].first)
                             {
                                 flag=loopj[(k+1)%loopj.size()].second;
                             }
@@ -362,19 +464,19 @@ int main()
                             k--;
                         }
                     }
-                    ///*
-                    cout << "release after" << endl;
-                    cout<< "loop1"<<endl;
-                    for(unsigned int i=0;i<loopi.size();i++)
-                    {
-                        cout <<loopi[i].first << " " << loopi[i].second.first << "," << loopi[i].second.second <<endl;
-                    }cout << endl;
-                    cout << "loop2" <<endl;
-                    for(unsigned int i=0;i<loopj.size();i++)
-                    {
-                        cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
-                    }cout << endl;
-                    //*/
+//                    ///*
+//                    cout << "release after" << endl;
+//                    cout<< "loop1"<<endl;
+//                    for(unsigned int i=0;i<loopi.size();i++)
+//                    {
+//                        cout <<loopi[i].first << " " << loopi[i].second.first << "," << loopi[i].second.second <<endl;
+//                    }cout << endl;
+//                    cout << "loop2" <<endl;
+//                    for(unsigned int i=0;i<loopj.size();i++)
+//                    {
+//                        cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
+//                    }cout << endl;
+//                    //*/
                     Loop loop1,loop2,loop3;
                     loop1=face[ii];
                     loop2=face[jj];
@@ -576,7 +678,7 @@ int main()
                             }
                         }
                     }
-                    /*
+
                     cout << "shuchu" <<endl;
                 for (unsigned int i=0;i<face1.size();i++)
                 {
@@ -586,7 +688,7 @@ int main()
                     }
                     cout <<endl;
                 }
-                */
+
                     if(IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]))
                     {
 
@@ -614,7 +716,9 @@ int main()
                             }
 
                             jj+=face1.size()-2;
+                            if(jj==face.size()-1)
 
+                            cout << ii << " " <<jj<<endl;
                             //  cout << "1-2" <<endl;
                         }
                     }
@@ -623,6 +727,7 @@ int main()
                         if(face1.size()==1)
                         {
                             face[jj]=face1[0];
+
                             // cout << "2-1" <<endl;
                         }
                         else
@@ -650,18 +755,18 @@ int main()
                     }
                     else if(!IsLoopClockwise(face[ii]) && !IsLoopClockwise(face[jj]))
                     {
-                        if(face1.size()==1)
-                        {
+
+                        cout <<"-----------------------------------------------------------"<<endl;
                             face.insert(face.begin(),face1.begin(),face1.end());
                             //   cout << "4-1" <<endl;
-                        }
+                        jj+=face1.size()-2;
                         // else
                         //  cout <<"4-2"<<endl;
                     }
                     loop1.clear();
                     loop2.clear();
                     face1.clear();
-                    // cout <<"----------------------------------"<<endl;
+                     cout <<"----------------------------------"<<endl;
                 }
 
             }
