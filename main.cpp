@@ -133,11 +133,11 @@ int main()
                             }
                         }
                     }
-                    //                cout<< "loop1"<<endl;
-                    //               for(int i=0;i<loopi.size();i++)
-                    //               {
-                    //                    cout <<loopi[i].first << " " << loopi[i].second.first << "," << loopi[i].second.second <<endl;
-                    //                }cout << endl;
+                                    cout<< "loop1"<<endl;
+                                   for(int i=0;i<loopi.size();i++)
+                                   {
+                                        cout <<loopi[i].first << " " << loopi[i].second.first << "," << loopi[i].second.second <<endl;
+                                    }cout << endl;
                     for(unsigned int j=0;j<(face[jj].size()-1);j++)
                     {
                         for(unsigned int i=0;i<(face[ii].size()-1);i++)
@@ -179,11 +179,11 @@ int main()
                             }
                         }
                     }
-                    //                cout << "loop2" <<endl;
-                    //                for(int i=0;i<loopj.size();i++)
-                    //                {
-                    //                    cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
-                    //               }cout << endl;
+                                    cout << "loop2" <<endl;
+                                    for(int i=0;i<loopj.size();i++)
+                                    {
+                                        cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
+                                   }cout << endl;
 
                 }
                 //	cout << 1 << endl;
@@ -231,6 +231,22 @@ int main()
                         }
                     }
                     for(unsigned int i=0;i<loopi.size();i++)
+                    {
+                        if(loopi[i].first+loopi[i+1].first==0 && loopi[i].first>0)
+                        {
+                            loopi.erase(loopi.begin()+i);
+                            loopi.erase(loopi.begin()+i);
+                        }
+                    }
+                    for(unsigned int i=0;i<loopj.size();i++)
+                    {
+                        if(loopj[i].first+loopj[i+1].first==0 && loopj[i].first>0)
+                        {
+                            loopj.erase(loopj.begin()+i);
+                            loopj.erase(loopj.begin()+i);
+                        }
+                    }
+                    for(unsigned int i=0;i<loopi.size();i++)
                     {int cnt=0;
                         for(unsigned int j=0;j<loopj.size();j++)
                         {
@@ -239,7 +255,6 @@ int main()
                             {
                                 cnt++;
                             }
-
                         }
                         if(cnt==0)
                         {
@@ -256,7 +271,6 @@ int main()
                             {
                                 cnt++;
                             }
-
                         }
                         if(cnt==0)
                         {
@@ -265,7 +279,7 @@ int main()
                         }
                     }
                     ///*
-                    cout << "release before" << endl;
+                    cout << "release before"<<"---------------------------------ex  "<<kk << endl;
                     cout<< "loop1"<<endl;
                     for(unsigned int i=0;i<loopi.size();i++)
                     {
@@ -282,9 +296,9 @@ int main()
                         if(loopi[k].first*loopi[(k+1)%loopi.size()].first>0)
                         {
                             Point flag;
-                            if(loopi[k].first<0)
+                            if(loopi[k].first>loopi[(k+1)%loopi.size()].first)
                             {
-                                flag=loopi[(k)%loopj.size()].second;
+                                flag=loopi[(k+1)%loopi.size()].second;
                             }
                             else
                             {
@@ -320,9 +334,9 @@ int main()
                         if(loopj[k].first*loopj[(k+1)%loopj.size()].first>0)
                         {
                             Point flag;
-                            if(loopj[k].first<0)
+                            if(loopj[k].first>loopj[(k+1)%loopj.size()].first)
                             {
-                                flag=loopj[(k)%loopj.size()].second;
+                                flag=loopj[(k+1)%loopj.size()].second;
                             }
                             else
                             {
@@ -520,6 +534,15 @@ int main()
                             if(loop3[0].second==loop3[loop3.size()-1].second)
                             {
                                 loop3.pop_back();
+                                for(unsigned int j=0;j<loop3.size();j++)
+                                {
+                                    if((loop3[j].second.first==loop3[(j+1)%loop3.size()].second.first && loop3[(j+1)%loop3.size()].second.first==loop3[(j+2)%loop3.size()].second.first) ||
+                                            (loop3[j].second.second==loop3[(j+1)%loop3.size()].second.second && loop3[(j+1)%loop3.size()].second.second==loop3[(j+2)%loop3.size()].second.second)	)
+                                    {
+                                        loop3.erase(loop3.begin()+(j+1)%loop3.size());
+                                        j--;
+                                    }
+                                }
                                 for(unsigned int j=0;j<loop3.size();j++)
                                 {
                                     if((loop3[j].second.first==loop3[(j+1)%loop3.size()].second.first && loop3[(j+1)%loop3.size()].second.first==loop3[(j+2)%loop3.size()].second.first) ||
