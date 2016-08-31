@@ -27,7 +27,7 @@ Rect TranLoopToRect(const Loop &loop1)
     double ymin=loop1[0].second.first;
     double xmax=loop1[0].second.second;
     double ymax=loop1[0].second.second;
-    for(int i=0;i<loop1.size()-1;i++)
+    for(unsigned int i=0;i<loop1.size()-1;i++)
     {
         if(loop1[i].second.first<xmin)
             xmin=loop1[i].second.first;
@@ -79,7 +79,7 @@ bool IsPointInLoop(const Loop &loop,const Point &p)
 {
     int cnt=0;
     Point p1=make_pair(-INFINITE,p.second);
-    for(int i=0;i<loop.size()-1;i++)
+    for(unsigned int i=0;i<loop.size()-1;i++)
     {
         if(IsPointOnLine(loop[i].second,loop[i+1].second,p))
         {
@@ -116,7 +116,7 @@ bool IsPointInsideLoop(const Loop &loop,const Point &p)
 {
     int cnt=0;
     Point p1=make_pair(-INFINITE,p.second);
-    for(int i=0;i<loop.size()-1;i++)
+    for(unsigned int i=0;i<loop.size()-1;i++)
     {
         if(IsPointOnLine(loop[i].second,loop[i+1].second,p))
         {
@@ -151,17 +151,42 @@ bool IsPointInsideLoop(const Loop &loop,const Point &p)
     }
     return ((cnt%2)==1);
 }
-
+bool IsLoopInsideLoop(const Loop &loop1,const Loop &loop2)
+{
+    unsigned int cnt1=0;
+    for(unsigned int i=0;i<loop2.size()-1;i++)
+    {
+        if(IsPointInsideLoop(loop1,loop2[i].second))
+        cnt1++;
+    }
+    unsigned int cnt2=0;
+    for(unsigned int i=0;i<loop1.size()-1;i++)
+    {
+        if(IsPointInsideLoop(loop2,loop1[i].second))
+        cnt2++;
+    }
+    if(cnt2==0 && cnt1==loop2.size()-1 && loop2.size()!=5)
+        return true;
+    if(loop2.size()==5)
+    {
+    Point p;
+    p.first=(loop2[0].second.first+loop2[2].second.first)/2;
+    p.second=(loop2[0].second.second+loop2[2].second.second)/2;
+    if(cnt2==0 && cnt1==loop2.size()-1 && IsPointInsideLoop(loop1,p))
+        return true;
+    }
+    return false;
+}
 bool IsLoopContainLoop(const Loop &loop1,const Loop &loop2)
 {
-    int cnt1=0;
-    for(int i=0;i<loop2.size()-1;i++)
+    unsigned int cnt1=0;
+    for(unsigned int i=0;i<loop2.size()-1;i++)
     {
         if(IsPointInLoop(loop1,loop2[i].second))
         cnt1++;
     }
-    int cnt2=0;
-    for(int i=0;i<loop1.size()-1;i++)
+    unsigned int cnt2=0;
+    for(unsigned int i=0;i<loop1.size()-1;i++)
     {
         if(IsPointInsideLoop(loop2,loop1[i].second))
         cnt2++;
@@ -182,7 +207,7 @@ bool IsLoopContainLoop(const Loop &loop1,const Loop &loop2)
 bool IsLoopConnectLoop(const Loop &loop1,const Loop &loop2)
 {
     int cnt=0;
-    for(int i=0;i<loop2.size()-1;i++)
+    for(unsigned int i=0;i<loop2.size()-1;i++)
     {
         if(IsPointInLoop(loop1,loop2[i].second))
         cnt++;
@@ -202,7 +227,7 @@ Loop TranRectToLoop(const Rect &rc)
     vector<double> y;
     x.push_back(rc.getx1());x.push_back(rc.getx2());x.push_back(rc.getx2());x.push_back(rc.getx1());
     y.push_back(rc.gety1());y.push_back(rc.gety1());y.push_back(rc.gety2());y.push_back(rc.gety2());
-    for(int i=0;i<=x.size();i++)
+    for(unsigned int i=0;i<=x.size();i++)
     {
         p.first=x[i%4];
         p.second=y[i%4];
@@ -227,9 +252,9 @@ Loop PaiXu(Loop &loop)
 int IsPolygonHavePublicPoint(const Loop &loop1,const Loop &loop2)
 {
     int cnt=0;
-    for(int i=0;i<loop1.size()-1;i++)
+    for(unsigned int i=0;i<loop1.size()-1;i++)
     {
-        for(int j=0;j<loop2.size()-1;j++)
+        for(unsigned int j=0;j<loop2.size()-1;j++)
         {
             if(loop1[i].second==loop2[j].second)
                 cnt++;
@@ -240,7 +265,7 @@ int IsPolygonHavePublicPoint(const Loop &loop1,const Loop &loop2)
 
 bool IsLineContain(const Point &p1,const Point &p2,const Point &p3,const Point &p4 )
 {
-    if(p1.first==p2.first && p2.first==p3.first && p3.first==p4.first || p1.second==p2.second && p3.second==p2.second &&p3.second==p4.second )
+    if((p1.first==p2.first && p2.first==p3.first && p3.first==p4.first) || (p1.second==p2.second && p3.second==p2.second &&p3.second==p4.second) )
     return true;
     else
     return false;
@@ -258,7 +283,7 @@ bool IsLoopClockwise(const Loop &loop)
 {
     int cnt1=0;
     int cnt2=0;
-    for(int i=0;i<loop.size()-1;i++)
+    for(unsigned int i=0;i<loop.size()-1;i++)
     {
         if(CrossProduct(loop[i+1].second.first-loop[i].second.first,loop[i+1].second.second-loop[i].second.second,loop[i+2].second.first-loop[i+1].second.first,loop[i+2].second.second-loop[i+1].second.second)>0)
             cnt1++;

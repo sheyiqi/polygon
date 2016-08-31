@@ -38,27 +38,19 @@ public:
 
 };
 bool IsRectIntersect(const Rect &rc1, const Rect &rc2);
-
+bool IsLoopInsideLoop(const Loop &loop1,const Loop &loop2);
 Rect TranLoopToRect(const Loop &loop1);
-
 bool IsPointInRect(const Rect& rc, const double &x, const double &y);
-
 double CrossProduct(const double &x1, const double &y1, const double &x2, const double &y2);
 bool IsLineIntersect(const Point &p1, const Point &p2, const Point &q1,const Point &q2);
-//point on line
 bool IsPointOnLine(const Point &p1, const Point &p2, const Point &q);
-
 bool IsPointInLoop(const Loop &loop,const Point &p);
 bool IsPointInsideLoop(const Loop &loop,const Point &p);
 bool IsLoopContainLoop(const Loop &loop1,const Loop &loop2);
-
 bool IsLoopConnectLoop(const Loop &loop1,const Loop &loop2);
 Loop TranRectToLoop(const Rect &rc);
-
 bool IsShorter(OrderPoint str1, OrderPoint str2);
-
 Loop PaiXu(Loop &loop);
-
 int IsPolygonHavePublicPoint(const Loop &loop1,const Loop &loop2);
 bool IsLoopClockwise(const Loop &loop);
 bool IsLineHavePublicPoint(const Point &p1, const Point &p2, const Point &q1,const Point &q2);
