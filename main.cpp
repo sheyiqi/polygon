@@ -59,12 +59,14 @@ int main()
 //                }cout <<endl;
 
                 Loop loopi,loopj;
+                if(!IsRectIntersect( TranLoopToRect(face[ii]),TranLoopToRect(face[jj])))
+                    continue;
                 // loops with a pubilc point
-                if(IsPolygonHavePublicPoint(face[ii],face[jj])==1 && publicPoint==1 && !(IsLoopConnectLoop(face[ii],face[jj]) || IsLoopConnectLoop(face[jj],face[ii])))
+                if(IsPolygonHavePublicVertex(face[ii],face[jj])==1 && publicPoint==1 && !(IsLoopIntersect(face[ii],face[jj]) || IsLoopIntersect(face[jj],face[ii])))
                 {
                     continue;
                 }
-                else if(IsloopHaveCommonLine(face[ii],face[jj]) && !IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]) && !IsLoopContainLoop(face[jj],face[ii]))
+                else if(IsloopHaveCommonLine(face[ii],face[jj]) && !IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]) && !IsLoopContainLoop(face[ii],face[jj]) && !IsLoopContainLoop(face[jj],face[ii]))
                 {
                     continue;
                 }
@@ -107,7 +109,7 @@ int main()
                     {
                         for(unsigned int j=0;j<(face[jj].size()-1);j++)
                         {
-                            if(IsLineContain(face[ii][i].second,face[ii][i+1].second,face[jj][j].second,face[jj][j+1].second))
+                            if(IsLineCollinear(face[ii][i].second,face[ii][i+1].second,face[jj][j].second,face[jj][j+1].second))
                             {
                                 continue;
                             }
@@ -151,7 +153,7 @@ int main()
                     {
                         for(unsigned int i=0;i<(face[ii].size()-1);i++)
                         {
-                            if(IsLineContain(face[ii][i].second,face[ii][i+1].second,face[jj][j].second,face[jj][j+1].second))
+                            if(IsLineCollinear(face[ii][i].second,face[ii][i+1].second,face[jj][j].second,face[jj][j+1].second))
                             {
                                 continue;
                             }
@@ -233,8 +235,8 @@ int main()
                             }
                         }
                     }
-                    PaiXu(loopi);
-                    PaiXu(loopj);
+                    MySort(loopi);
+                    MySort(loopj);
                     Loop::iterator end_unique1 = unique(loopi.begin(),loopi.end());
                     loopi.erase(end_unique1, loopi.end());
                     Loop::iterator end_unique2 = unique(loopj.begin(),loopj.end());
@@ -507,8 +509,8 @@ int main()
 //                        cout << loop2[i].first << ":"  << loop2[i].second.first << "," << loop2[i].second.second << "\t" ;
 //                    }cout <<endl;
 
-                    PaiXu(loop1);
-                    PaiXu(loop2);
+                    MySort(loop1);
+                    MySort(loop2);
 
 //                    cout << "paixu" <<endl;
 //                    for(unsigned int i=0;i<loop1.size();i++)

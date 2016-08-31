@@ -12,7 +12,7 @@ typedef vector<pair<double,pair<double,double> > > Loop;
 typedef vector<vector<pair<double,pair<double,double> > > > Face;
 
 
-
+//快速排斥实验
 bool IsRectIntersect(const Rect &rc1, const Rect &rc2)
 {
     return ((std::max(rc1.getx1(), rc1.getx2()) >= std::min(rc2.getx1(), rc2.getx2())) &&
@@ -24,8 +24,8 @@ bool IsRectIntersect(const Rect &rc1, const Rect &rc2)
 Rect TranLoopToRect(const Loop &loop1)
 {
     double xmin=loop1[0].second.first;
-    double ymin=loop1[0].second.first;
-    double xmax=loop1[0].second.second;
+    double xmax=loop1[0].second.first;
+    double ymin=loop1[0].second.second;
     double ymax=loop1[0].second.second;
     for(unsigned int i=0;i<loop1.size()-1;i++)
     {
@@ -42,6 +42,7 @@ Rect TranLoopToRect(const Loop &loop1)
     return rc;
 }
 
+
 bool IsPointInRect(const Rect& rc, const double &x, const double &y)
 {
     return ((x>=rc.getx1() && x<=rc.getx2()) && (y>=rc.gety1() && y<=rc.gety2()));
@@ -51,7 +52,7 @@ double CrossProduct(const double &x1, const double &y1, const double &x2, const 
 {
     return x1*y2-x2*y1;
 }
-//跨立实验//可以再优化
+//跨立实验
 bool IsLineIntersect(const Point &p1, const Point &p2, const Point &q1,const Point &q2)
 {
     Rect rc1(p1.first,p1.second,p2.first,p2.second);
@@ -64,17 +65,17 @@ bool IsLineIntersect(const Point &p1, const Point &p2, const Point &q1,const Poi
     double q2_p=CrossProduct(q2.first-p1.first,q2.second-p1.second,p2.first-p1.first,p2.second-p1.second);
     return (p1_q*p2_q<=0 && q1_p*q2_p<=0);
 }
-bool IsLineIntersectWithoutEndpoint(const Point &p1, const Point &p2, const Point &q1,const Point &q2)
+
+bool IsLineIntersectWithoutVertex(const Point &p1, const Point &p2, const Point &q1,const Point &q2)
 {
-    Rect rc1(p1.first,p1.second,p2.first,p2.second);
-    Rect rc2(q1.first,q1.second,q2.first,q2.second);
-    if(!IsRectIntersect(rc1,rc2))
-    {	return false;	}
-    double p1_q=CrossProduct(p1.first-q1.first,p1.second-q1.second,q2.first-q1.first,q2.second-q1.second);
-    double p2_q=CrossProduct(p2.first-q1.first,p2.second-q1.second,q2.first-q1.first,q2.second-q1.second);
-    double q1_p=CrossProduct(q1.first-p1.first,q1.second-p1.second,p2.first-p1.first,p2.second-p1.second);
-    double q2_p=CrossProduct(q2.first-p1.first,q2.second-p1.second,p2.first-p1.first,p2.second-p1.second);
-    return (p1_q*p2_q<0 && q1_p*q2_p<0);
+    if(IsLineIntersect(p1, p2, q1, q2))
+    {
+        if(IsPointOnLine(p1,p2,q1) || IsPointOnLine(p1,p2,q2) || IsPointOnLine(q1,q2,p1) || IsPointOnLine(q1,q2,p2))
+            return false;
+        else
+            return true;
+    }
+    return false;
 }
 //point on line
 bool IsPointOnLine(const Point &p1, const Point &p2, const Point &q)
@@ -207,7 +208,7 @@ bool IsLoopContainLoop(const Loop &loop1,const Loop &loop2)
     {
         for(unsigned int j=0;j<loop1.size()-1;j++)
         {
-            if(IsLineIntersectWithoutEndpoint(loop2[i].second,loop2[i+1].second,loop1[j].second,loop1[j+1].second))
+            if(IsLineIntersectWithoutVertex(loop2[i].second,loop2[i+1].second,loop1[j].second,loop1[j+1].second))
                 cnt3++;
         }
     }
@@ -225,29 +226,47 @@ bool IsLoopContainLoop(const Loop &loop1,const Loop &loop2)
 }
 bool IsloopHaveCommonLine(const Loop &loop1,const Loop &loop2)
 {
-    unsigned int cnt=0;
-    for(unsigned int i=0;i<loop1.size();i++)
+    int cnt1=0;
+    for(unsigned int i=0;i<loop2.size()-1;i++)
     {
-        for(unsigned int j=0;j<loop2.size();j++)
+        if(IsPointInsideLoop(loop1,loop2[i].second))
+        cnt1++;
+    }
+    int cnt2=0;
+    for(unsigned int i=0;i<loop1.size()-1;i++)
+    {
+        if(IsPointInsideLoop(loop2,loop1[i].second))
+        cnt2++;
+    }
+    unsigned int cnt3=0;
+    for(unsigned int i=0;i<loop2.size()-1;i++)
+    {
+        for(unsigned int j=0;j<loop1.size()-1;j++)
         {
-            if(IsLineContain(loop1[i].second,loop1[i+1].second,loop2[j].second,loop2[j+1].second) && (IsPointOnLine(loop1[i].second,loop1[i+1].second,loop2[j].second) || IsPointOnLine(loop1[i].second,loop1[i+1].second,loop2[j+1].second)))
-                cnt++;
+            if(IsLineIntersectWithoutVertex(loop2[i].second,loop2[i+1].second,loop1[j].second,loop1[j+1].second))
+                cnt3++;
         }
     }
-    if(cnt>0)
+    if(cnt1==0 && cnt2==0 && cnt3==0)
         return true;
     else
         return false;
 }
-bool IsLoopConnectLoop(const Loop &loop1,const Loop &loop2)
+bool IsLoopIntersect(const Loop &loop1,const Loop &loop2)
 {
-    int cnt=0;
+    int cnt1=0;
     for(unsigned int i=0;i<loop2.size()-1;i++)
     {
         if(IsPointInLoop(loop1,loop2[i].second))
-        cnt++;
+        cnt1++;
     }
-    if(cnt>1)
+    int cnt2=0;
+    for(unsigned int i=0;i<loop1.size()-1;i++)
+    {
+        if(IsPointInLoop(loop2,loop1[i].second))
+        cnt2++;
+    }
+    if(cnt1>1||cnt2>1)
     return true;
     else
     return false;
@@ -273,18 +292,18 @@ Loop TranRectToLoop(const Rect &rc)
     return loop;
 }
 
-bool IsShorter(OrderPoint str1, OrderPoint str2)
+bool IsFirstNumSmaller(OrderPoint str1, OrderPoint str2)
 {
     return fabs(str1.first) < fabs(str2.first);
 }
 
-Loop PaiXu(Loop &loop)
+Loop MySort(Loop &loop)
 {
-    stable_sort(loop.begin(),loop.end(),IsShorter);
+    stable_sort(loop.begin(),loop.end(),IsFirstNumSmaller);
     return loop;
 }
 
-int IsPolygonHavePublicPoint(const Loop &loop1,const Loop &loop2)
+int IsPolygonHavePublicVertex(const Loop &loop1,const Loop &loop2)
 {
     int cnt=0;
     for(unsigned int i=0;i<loop1.size()-1;i++)
@@ -298,7 +317,7 @@ int IsPolygonHavePublicPoint(const Loop &loop1,const Loop &loop2)
     return cnt;
 }
 
-bool IsLineContain(const Point &p1,const Point &p2,const Point &p3,const Point &p4 )
+bool IsLineCollinear(const Point &p1,const Point &p2,const Point &p3,const Point &p4 )
 {
     if((p1.first==p2.first && p2.first==p3.first && p3.first==p4.first) || (p1.second==p2.second && p3.second==p2.second &&p3.second==p4.second) )
     return true;
@@ -306,7 +325,7 @@ bool IsLineContain(const Point &p1,const Point &p2,const Point &p3,const Point &
     return false;
 }
 
-bool IsLineHavePublicPoint(const Point &p1, const Point &p2, const Point &q1,const Point &q2)
+bool IsLineHavePublicVertex(const Point &p1, const Point &p2, const Point &q1,const Point &q2)
 {
     if(p1==q1 || p1==q2 || p2==q1 || p2==q2)
         return true;
@@ -330,3 +349,4 @@ bool IsLoopClockwise(const Loop &loop)
     else
     return false;
 }
+
