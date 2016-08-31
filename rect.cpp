@@ -46,7 +46,7 @@ bool IsPointInRect(const Rect& rc, const double &x, const double &y)
 {
     return ((x>=rc.getx1() && x<=rc.getx2()) && (y>=rc.gety1() && y<=rc.gety2()));
 }
-// tran points to line
+
 double CrossProduct(const double &x1, const double &y1, const double &x2, const double &y2)
 {
     return x1*y2-x2*y1;
@@ -62,8 +62,19 @@ bool IsLineIntersect(const Point &p1, const Point &p2, const Point &q1,const Poi
     double p2_q=CrossProduct(p2.first-q1.first,p2.second-q1.second,q2.first-q1.first,q2.second-q1.second);
     double q1_p=CrossProduct(q1.first-p1.first,q1.second-p1.second,p2.first-p1.first,p2.second-p1.second);
     double q2_p=CrossProduct(q2.first-p1.first,q2.second-p1.second,p2.first-p1.first,p2.second-p1.second);
-//	cout << p1_q <<p2_q<<q1_p<<q2_p<<endl;
     return (p1_q*p2_q<=0 && q1_p*q2_p<=0);
+}
+bool IsLineIntersectWithoutEndpoint(const Point &p1, const Point &p2, const Point &q1,const Point &q2)
+{
+    Rect rc1(p1.first,p1.second,p2.first,p2.second);
+    Rect rc2(q1.first,q1.second,q2.first,q2.second);
+    if(!IsRectIntersect(rc1,rc2))
+    {	return false;	}
+    double p1_q=CrossProduct(p1.first-q1.first,p1.second-q1.second,q2.first-q1.first,q2.second-q1.second);
+    double p2_q=CrossProduct(p2.first-q1.first,p2.second-q1.second,q2.first-q1.first,q2.second-q1.second);
+    double q1_p=CrossProduct(q1.first-p1.first,q1.second-p1.second,p2.first-p1.first,p2.second-p1.second);
+    double q2_p=CrossProduct(q2.first-p1.first,q2.second-p1.second,p2.first-p1.first,p2.second-p1.second);
+    return (p1_q*p2_q<0 && q1_p*q2_p<0);
 }
 //point on line
 bool IsPointOnLine(const Point &p1, const Point &p2, const Point &q)
@@ -191,9 +202,18 @@ bool IsLoopContainLoop(const Loop &loop1,const Loop &loop2)
         if(IsPointInsideLoop(loop2,loop1[i].second))
         cnt2++;
     }
-    if(cnt2==0 && cnt1==loop2.size()-1 && loop2.size()!=5)
+    unsigned int cnt3=0;
+    for(unsigned int i=0;i<loop2.size()-1;i++)
+    {
+        for(unsigned int j=0;j<loop1.size()-1;j++)
+        {
+            if(IsLineIntersectWithoutEndpoint(loop2[i].second,loop2[i+1].second,loop1[j].second,loop1[j+1].second))
+                cnt3++;
+        }
+    }
+    if(cnt2==0 && cnt1==loop2.size()-1 && cnt3==0 && loop2.size()!=5)
         return true;
-    if(loop2.size()==5)
+    if(cnt2==0 && cnt1==loop2.size()-1 && cnt3==0 && loop2.size()==5)
     {
     Point p;
     p.first=(loop2[0].second.first+loop2[2].second.first)/2;

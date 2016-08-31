@@ -55,5 +55,5 @@ int IsPolygonHavePublicPoint(const Loop &loop1,const Loop &loop2);
 bool IsLoopClockwise(const Loop &loop);
 bool IsLineHavePublicPoint(const Point &p1, const Point &p2, const Point &q1,const Point &q2);
 bool IsLineContain(const Point &p1,const Point &p2,const Point &p3,const Point &p4 );
-
+bool IsLineIntersectWithoutEndpoint(const Point &p1, const Point &p2, const Point &q1,const Point &q2);
 #endif // RECT_H
