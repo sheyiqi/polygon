@@ -223,7 +223,22 @@ bool IsLoopContainLoop(const Loop &loop1,const Loop &loop2)
     }
     return false;
 }
-
+bool IsloopHaveCommonLine(const Loop &loop1,const Loop &loop2)
+{
+    unsigned int cnt=0;
+    for(unsigned int i=0;i<loop1.size();i++)
+    {
+        for(unsigned int j=0;j<loop2.size();j++)
+        {
+            if(IsLineContain(loop1[i].second,loop1[i+1].second,loop2[j].second,loop2[j+1].second) && (IsPointOnLine(loop1[i].second,loop1[i+1].second,loop2[j].second) || IsPointOnLine(loop1[i].second,loop1[i+1].second,loop2[j+1].second)))
+                cnt++;
+        }
+    }
+    if(cnt>0)
+        return true;
+    else
+        return false;
+}
 bool IsLoopConnectLoop(const Loop &loop1,const Loop &loop2)
 {
     int cnt=0;

@@ -21,7 +21,7 @@ int main()
     unsigned int maxnum=sizeof(ex)/sizeof(ex[0]);
     for( int kk=1;kk<=ex[maxnum-1].flag;kk++)
     {
-        cout << "ex" <<kk<<endl;
+//        cout << "ex" <<kk<<endl;
         vector<Rect> Vrect;
         for(unsigned int i=0;i<maxnum;i++)
         {
@@ -45,18 +45,18 @@ int main()
             {
                 if(ii==jj)
                     continue;
-                cout << "size:" << face.size() <<endl;
-                cout << "ii="<< ii <<"," << "jj="<<jj<<endl;
-                cout << IsLoopClockwise(face[ii]) << "_" << IsLoopClockwise(face[jj])<<endl;
-                cout << "origin polygon " <<endl;
-                for(unsigned int i=0;i<face[ii].size();i++)
-                {
-                    cout <<face[ii][i].first << ":" << face[ii][i].second.first << "," << face[ii][i].second.second <<"\t";
-                }cout <<endl;
-                for(unsigned int i=0;i<face[jj].size();i++)
-                {
-                    cout <<face[jj][i].first << ":" << face[jj][i].second.first << "," << face[jj][i].second.second <<"\t";
-                }cout <<endl;
+//                cout << "size:" << face.size() <<endl;
+//                cout << "ii="<< ii <<"," << "jj="<<jj<<endl;
+//                cout << IsLoopClockwise(face[ii]) << "_" << IsLoopClockwise(face[jj])<<endl;
+//                cout << "origin polygon " <<endl;
+//                for(unsigned int i=0;i<face[ii].size();i++)
+//                {
+//                    cout <<face[ii][i].first << ":" << face[ii][i].second.first << "," << face[ii][i].second.second <<"\t";
+//                }cout <<endl;
+//                for(unsigned int i=0;i<face[jj].size();i++)
+//                {
+//                    cout <<face[jj][i].first << ":" << face[jj][i].second.first << "," << face[jj][i].second.second <<"\t";
+//                }cout <<endl;
 
                 Loop loopi,loopj;
                 // loops with a pubilc point
@@ -64,7 +64,10 @@ int main()
                 {
                     continue;
                 }
-                //loop contain loop
+                else if(IsloopHaveCommonLine(face[ii],face[jj]) && !IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]) && !IsLoopContainLoop(face[jj],face[ii]))
+                {
+                    continue;
+                }
                 else if(IsLoopContainLoop(face[ii],face[jj]) && IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]))
                 {
                     face.erase(face.begin()+jj);
@@ -82,6 +85,10 @@ int main()
                     face.erase(face.begin()+ii);
                     jj--;
                     jj--;
+                }
+                else if(IsLoopInsideLoop(face[jj],face[ii]) && !IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]) && !IsLoopClockwise(face[jj-1]))
+                {
+                    continue;
                 }
                 else if(IsLoopInsideLoop(face[ii],face[jj]) && !IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]))
                 {
@@ -662,15 +669,15 @@ int main()
                         }
                     }
 
-                    cout << "shuchu" <<endl;
-                    for (unsigned int i=0;i<face1.size();i++)
-                    {
-                        for (unsigned int j=0;j<face1[i].size();j++)
-                        {
-                            cout << face1[i][j].first << "::" << face1[i][j].second.first << ',' << face1[i][j].second.second <<'\t';
-                        }
-                        cout <<endl;
-                    }
+//                    cout << "shuchu" <<endl;
+//                    for (unsigned int i=0;i<face1.size();i++)
+//                    {
+//                        for (unsigned int j=0;j<face1[i].size();j++)
+//                        {
+//                            cout << face1[i][j].first << "::" << face1[i][j].second.first << ',' << face1[i][j].second.second <<'\t';
+//                        }
+//                        cout <<endl;
+//                    }
 
                     if(IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]))
                     {
@@ -743,6 +750,7 @@ int main()
                             face.erase(face.begin()+ii);
                             face.insert(face.begin()+ii,face1.begin(),face1.end());
                             jj+=face1.size()-2;
+
                             //  cout << "3-2" <<endl;
                         }
                     }
@@ -752,13 +760,13 @@ int main()
                         face.insert(face.begin()+ii,face1.begin(),face1.end());
                         //   cout << "4-1" <<endl;
                         jj+=face1.size();
-                        ii++;
+                        ii+=face1.size();
                         //  cout <<"4-2"<<endl;
                     }
                     loop1.clear();
                     loop2.clear();
                     face1.clear();
-                    cout <<"----------------------------------"<<endl;
+                    //cout <<"----------------------------------"<<endl;
                 }
 
             }
