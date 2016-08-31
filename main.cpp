@@ -8,7 +8,7 @@
 #include "test.hpp"
 #include <fstream>
 using namespace std;
-#define publicPoint 0 //1表示共点多边形分开算 0 表示共点多边形算一个多边形
+#define publicPoint 1 //1表示共点多边形分开算 0 表示共点多边形算一个多边形
 #define INFINITE 100    //bianjie
 typedef pair<double,double> Point;
 typedef pair<double,pair<double,double> > OrderPoint;
@@ -684,6 +684,11 @@ int main()
                             face[ii]=face1[0];
                             face.erase(face.begin()+jj);
                             jj--;
+                            if(jj==face.size()-1)
+                            {
+                                ii=0;
+                                jj=0;
+                            }
                             //  cout << "1-1" <<endl;
 
 
@@ -697,7 +702,7 @@ int main()
                             if(jj==face.size()-1)
                             {
                                 ii=0;
-                                jj=1;
+                                jj=0;
                             }
                             //  cout << "1-2" <<endl;
                         }
