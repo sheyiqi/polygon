@@ -10,10 +10,10 @@
 using namespace std;
 #define publicPoint 0 //1表示共点多边形分开算 0 表示共点多边形算一个多边形
 #define INFINITE 100    //bianjie
-typedef pair<double,double> Point;
-typedef pair<double,pair<double,double> > OrderPoint;
-typedef vector<pair<double,pair<double,double> > > Loop;
-typedef vector<vector<pair<double,pair<double,double> > > > Face;
+typedef pair<double,double> Point;      //dian  
+typedef pair<double,pair<double,double> > OrderPoint;   //daixuehaode xulie
+typedef vector<pair<double,pair<double,double> > > Loop;    //xulie jihe
+typedef vector<vector<pair<double,pair<double,double> > > > Face; // duoge xulie jiehe 
 
 int main()
 {
@@ -59,39 +59,46 @@ int main()
                 //                }cout <<endl;
 
                 Loop loopi,loopj;
-                if(!IsRectIntersect( TranLoopToRect(face[ii]),TranLoopToRect(face[jj])))
+                // xiangli
+                if(!IsRectIntersect( TranLoopToRect(face[ii]),TranLoopToRect(face[jj]))) 
                     continue;
                 // loops with a pubilc point
-                if(IsPolygonHavePublicVertex(face[ii],face[jj])==1 && publicPoint==1 && !(IsLoopIntersect(face[ii],face[jj]) || IsLoopIntersect(face[jj],face[ii])))
+                if(IsPolygonHavePublicVertex(face[ii],face[jj])==1 && publicPoint==1 && !(IsLoopIntersect(face[ii],face[jj]) || IsLoopIntersect(face[jj],face[ii]))) 
                 {
                     continue;
                 }
+                // polygon and hole have common edge
                 else if(IsloopHaveCommonLine(face[ii],face[jj]) && !IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]) && !IsLoopContainLoop(face[ii],face[jj]) && !IsLoopContainLoop(face[jj],face[ii]))
                 {
                     continue;
                 }
+                // polygon1 contain polygon2
                 else if(IsLoopContainLoop(face[ii],face[jj]) && IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]))
                 {
                     face.erase(face.begin()+jj);
                     jj--;
                     jj--;
                 }
+                // polygon2 which after polygon contains polygon1
                 else if(IsLoopContainLoop(face[jj],face[ii]) && IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]) && IsLoopClockwise(face[jj-1]))
                 {
                     face.erase(face.begin()+ii);
                     jj--;
                     jj--;
                 }
+                // polygon1 which after polygon contains hole1
                 else if(IsLoopContainLoop(face[jj],face[ii]) && !IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]) && IsLoopClockwise(face[jj-1]))
                 {
                     face.erase(face.begin()+ii);
                     jj--;
                     jj--;
                 }
+                // polygon1 which after hole contains hole1 
                 else if(IsLoopInsideLoop(face[jj],face[ii]) && !IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]) && !IsLoopClockwise(face[jj-1]))
                 {
                     continue;
                 }
+                // hole1 contain polygon 1
                 else if(IsLoopInsideLoop(face[ii],face[jj]) && !IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]))
                 {
                     face.insert(face.begin()+ii,face[jj]);
@@ -99,22 +106,27 @@ int main()
                     jj--;
                     jj--;
                 }
+                // hole1 contain hole2
                 else if(IsLoopContainLoop(face[jj],face[ii]) && !IsLoopClockwise(face[ii]) && !IsLoopClockwise(face[jj]))
                 {
                     continue;
                 }
+                // loop1 intersect loop2
                 else
                 {
                     for(unsigned int i=0;i<(face[ii].size()-1);i++)
                     {
                         for(unsigned int j=0;j<(face[jj].size()-1);j++)
                         {
+                            // 4 points collineation
                             if(IsLineCollinear(face[ii][i].second,face[ii][i+1].second,face[jj][j].second,face[jj][j+1].second))
                             {
                                 continue;
                             }
+                            // intersect
                             if(IsLineIntersect(face[ii][i].second,face[ii][i+1].second,face[jj][j].second,face[jj][j+1].second))
                             {
+                                // generate series
                                 OrderPoint op;
                                 if(face[ii][i].second.first==face[ii][i+1].second.first && face[jj][j].second.second==face[jj][j+1].second.second)
                                 {
@@ -127,6 +139,7 @@ int main()
                                     op.second.second=face[ii][i].second.second;
                                 }
                                 int va;
+                                // qiu jiao dian
                                 if(0 < CrossProduct(face[ii][i+1].second.first-face[ii][i].second.first,
                                                     face[ii][i+1].second.second-face[ii][i].second.second,
                                                     face[jj][j+1].second.first-face[jj][j].second.first,
@@ -134,7 +147,7 @@ int main()
                                     va=1;
                                 else
                                     va=-1;
-
+                                //qiu xuhao
                                 op.first=va*(i+1+((op.second.first+op.second.second)-(face[ii][i].second.first+face[ii][i].second.second))
                                              /((face[ii][i+1].second.first+face[ii][i+1].second.second)-(face[ii][i].second.first+face[ii][i].second.second)));
                                 loopi.push_back(op);
@@ -148,7 +161,7 @@ int main()
                     //                    {
                     //                        cout <<loopi[i].first << " " << loopi[i].second.first << "," << loopi[i].second.second <<endl;
                     //                    }cout << endl;
-
+                    // exchange loop1 and loop2
                     for(unsigned int j=0;j<(face[jj].size()-1);j++)
                     {
                         for(unsigned int i=0;i<(face[ii].size()-1);i++)
@@ -196,6 +209,7 @@ int main()
                 Face face0;
                 if(loopi.size()!=0)
                 {
+                    // insert loop in series
                     for(unsigned int i=0;i<loopi.size();i++)
                     {
                         Point p;
@@ -253,7 +267,7 @@ int main()
                     //                    {
                     //                        cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
                     //                    }cout << endl;
-
+                    // delete the first point and the last point
                     if(loopi[0].second.first==loopi[loopi.size()-1].second.first && loopi[0].second.second==loopi[loopi.size()-1].second.second)
                     {
                         if(loopi[0].first==-1 && loopi[loopi.size()-1].first+face[ii].size()==0)
@@ -298,7 +312,7 @@ int main()
                     //                    {
                     //                        cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
                     //                    }cout << endl;
-
+                    // delete the point of intersection ,first one is + and second one is -
                     for(unsigned int i=0;i<loopi.size();)
                     {
                         if(loopi[i].first+loopi[i+1].first==0 && loopi[i].first>0)
@@ -338,7 +352,7 @@ int main()
                     //                    {
                     //                        cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
                     //                    }cout << endl;
-
+                    // delete the same point of two loops
                     for(unsigned int i=0;i<loopi.size();i++)
                     {
                         int cnt=0;
@@ -385,7 +399,7 @@ int main()
                     //                    {
                     //                        cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
                     //                    }cout << endl;
-
+                    // delete 
                     for(unsigned int k=0;k<loopi.size();k++)
                     {
                         if(loopi[k].first*loopi[(k+1)%loopi.size()].first>0)
@@ -418,12 +432,6 @@ int main()
                             k--;
                         }
                     }
-                    //                    cout << "i done" <<endl;
-                    //                    cout<< "loop1"<<endl;
-                    //                    for(unsigned int i=0;i<loopi.size();i++)
-                    //                    {
-                    //                        cout <<loopi[i].first << " " << loopi[i].second.first << "," << loopi[i].second.second <<endl;
-                    //                    }cout << endl;
                     for(unsigned int k=0;k<loopj.size();k++)
                     {
                         if(loopj[k].first*loopj[(k+1)%loopj.size()].first>0)
@@ -469,7 +477,7 @@ int main()
                     //                    {
                     //                        cout <<loopj[i].first << " " << loopj[i].second.first << "," << loopj[i].second.second <<endl;
                     //                    }cout << endl;
-
+                    
                     Loop loop1,loop2,loop3;
                     loop1=face[ii];
                     loop2=face[jj];
@@ -521,7 +529,7 @@ int main()
                     //                    {
                     //                        cout << loop2[i].first << ":"  << loop2[i].second.first << "," << loop2[i].second.second << "\t" ;
                     //                    }cout <<endl;
-
+                    // delete first point and last point
                     if(loop1[0].second==loop1[loop1.size()-1].second && find(loopi.begin(),loopi.end(),loop1[loop1.size()-1])==loopi.end())
                         loop1.erase(loop1.begin());
                     if(loop1[0].second==loop1[loop1.size()-1].second && find(loopi.begin(),loopi.end(),loop1[0])==loopi.end())
@@ -543,7 +551,7 @@ int main()
                     //                        cout << loop2[i].first << ":"  << loop2[i].second.first << "," << loop2[i].second.second << "\t" ;
                     //                    }cout <<endl;
 
-
+                    // clear up series
                     while(find(loopi.begin(),loopi.end(),loop1[0])==loopi.end() || loop1[0].first<0)
                     {
                         loop1.push_back(loop1[0]);
@@ -565,7 +573,7 @@ int main()
                     //                    {
                     //                        cout << loop2[i].first << ":"  << loop2[i].second.first << "," << loop2[i].second.second << "\t" ;
                     //                    }cout <<endl;
-
+                    // cut series
                     Loop lp1;
                     while (loop1.size()!=0)
                     {
@@ -608,7 +616,7 @@ int main()
                     //                        }
                     //                        cout <<endl;
                     //                    }
-
+                    // delete points of collineation
                     Face face1;
                     loop3=(face0[0]);
                     face0.erase(face0.begin());
@@ -680,7 +688,7 @@ int main()
                     //                        }
                     //                        cout <<endl;
                     //                    }
-
+                    //clear up hole and polygon 
                     if(IsLoopClockwise(face[ii]) && IsLoopClockwise(face[jj]))
                     {
                         if(face1.size()==1)
@@ -773,6 +781,7 @@ int main()
 
             }
         }
+        //output file
         fout << "ex "<< kk << ":"<<endl;
         for(unsigned int j=0;j<face.size();j++)
         {
